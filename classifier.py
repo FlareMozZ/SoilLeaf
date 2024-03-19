@@ -101,10 +101,28 @@ def country(place):
         # prints the coordinates of the first result
         return data["features"][0]["properties"]["country"]
 
+
+def most_pr_soil(lati,longi):
+    with Client() as client:
+        # Get the most probable soil type at the queried location
+        response = client.get(
+            url="https://api-test.openepi.io/soil/type",
+            params={"lat": lati, "lon": longi},
+        )
+
+        data = response.json()
+
+        # Get the most probable soil type
+        most_probable_soil_type = data["properties"]["most_probable_soil_type"]
+
+        return most_probable_soil_type
+    
+
 text = ""
 lat = ""
 long = ""
 cntry = ""
+soil= ""
 
 index1 = """
 # Geocoding Service
@@ -117,13 +135,16 @@ Place name: <|{text}|>
 Latitude is: <|{lat}|> <br/>
 Longitude is: <|{long}|> <br/>
 country: <|{cntry}|> <br/>
-
+soil :  <|{soil}|> <br/>
 """
 
 def on_button_action(state):
         state.lat = latitude(state.text)
+        
         state.long = longitude(state.text)
+         
         state.cntry = country(state.text)
+        state.soil= most_pr_soil(state.lat,state.long)
         notify(state, 'info', f'The place is: {state.text}')
         notify(state, 'info', f'The country is: {state.cntry}')
         notify(state, 'info', f'The latitude is: {state.lat}')
@@ -145,6 +166,23 @@ pages = {
     "plantdisease": index,
     "soilinfo": index1,
 }
+
+
+def most_pr_soil(lati,longi):
+    with Client() as client:
+        # Get the most probable soil type at the queried location
+        response = client.get(
+            url="https://api-test.openepi.io/soil/type",
+            params={"lat": lati, "lon": longi},
+        )
+
+        data = response.json()
+
+        # Get the most probable soil type
+        most_probable_soil_type = data["properties"]["most_probable_soil_type"]
+
+        return most_probable_soil_type
+
 
 app = Gui(pages=pages)
 
